@@ -53,6 +53,27 @@ func ParseSampledHeader(flowMessage *flowmessage.FlowMessage, sampledHeader *sfl
 			etherType = data[16:18]
 		}
 
+		if etherType[0] == 0x88 && etherType[1] == 0x47 { // MPLS
+			iterateMpls := true
+			for iterateMpls {
+				label := binary.BigEndian.Uint32(append([]byte{0}, data[offset+14:offset+17]...)) >> 4
+				exp := data[offset+16] > 1
+				bottom := data[offset+16]&1
+				mplsTtl := data[offset+17]
+				offset += 4
+				fmt.Printf("%v %v %v %d\n", label, exp, bottom, mplsTtl)
+				if bottom == 1 || label <= 15 || offset > len(data) {
+					if data[offset+18]&0xf0>>4 == 4 {
+						etherType = []byte{0x8, 0x0}
+					} else if data[offset+18]&0xf0>>4 == 6 {
+						etherType = []byte{0x86, 0xdd}
+					}
+					
+					iterateMpls = false
+				}
+			}
+		}
+
 		(*flowMessage).Etype = uint32(binary.BigEndian.Uint16(etherType[0:2]))
 
 		if etherType[0] == 0x8 && etherType[1] == 0x0 { // IPv4
