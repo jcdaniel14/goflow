@@ -3,10 +3,10 @@ package transport
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"fmt"
 	flowmessage "github.com/cloudflare/goflow/pb"
 	"github.com/cloudflare/goflow/utils"
-	proto "github.com/golang/protobuf/proto"
 	//"github.com/golang/protobuf/descriptor"
 	"errors"
 	"flag"
@@ -143,7 +143,11 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 		keyStr := HashProto(s.keying, flowMessage)
 		key = sarama.StringEncoder(keyStr)
 	}
-	b, _ := proto.Marshal(flowMessage)
+
+	b, _ := json.Marshal(flowMessage)
+	reqString := string(b)
+	fmt.Println("Format --> ", reqString)
+	//b, _ := proto.Marshal(flowMessage)
 	s.producer.Input() <- &sarama.ProducerMessage{
 		Topic: s.topic,
 		Key:   key,
