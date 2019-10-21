@@ -8,6 +8,7 @@ import (
 	flowmessage "github.com/cloudflare/goflow/pb"
 	"github.com/cloudflare/goflow/utils"
 	"net"
+	"strconv"
 	"time"
 
 	//"github.com/golang/protobuf/descriptor"
@@ -182,7 +183,8 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	flowStart := f.TimeFlowStart
 	flowEnd := f.TimeFlowEnd
 	srcAddr := net.IP(f.SrcAddr).String()
-	srcIf := "Bundle-Ether90"
+
+	srcIf := strconv.Itoa(int(f.SrcIf))
 	if strings.Contains(srcAddr, ":") {
 		ipVersion = "IPv6"
 	} else {
