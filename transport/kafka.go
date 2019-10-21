@@ -7,6 +7,9 @@ import (
 	"fmt"
 	flowmessage "github.com/cloudflare/goflow/pb"
 	"github.com/cloudflare/goflow/utils"
+	"net"
+	"time"
+
 	//"github.com/golang/protobuf/descriptor"
 	"errors"
 	"flag"
@@ -34,6 +37,23 @@ type KafkaState struct {
 	topic    string
 	hashing  bool
 	keying   []string
+}
+
+type Flow struct {
+	Exporter  string `json:"flow.exporter"`
+	FlowStart string `json:"flow.first_switched"`
+	FlowEnd   string `json:"flow.last_switched"`
+	Bytes     uint64 `json:"flow.bytes"`
+	Packets   uint64 `json:"flow.packets"`
+	SrcAddr   string `json:"flow.src_addr"`
+	DstAddr   string `json:"flow.dst_addr"`
+	Protocol  uint32 `json:"flow.protocol"`
+	IPVersion string `json:"flow.ip_version"`
+	SrcPort   uint32 `json:"flow.src_port"`
+	DstPort   uint32 `json:"flow.dst_port"`
+	IfName    string `json:"flow.input_ifname"`
+	SrcMask   uint32 `json:"flow.src_mask"`
+	DstMask   uint32 `json:"flow.dst_mask"`
 }
 
 func RegisterFlags() {
@@ -143,8 +163,9 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 		keyStr := HashProto(s.keying, flowMessage)
 		key = sarama.StringEncoder(keyStr)
 	}
-
-	b, _ := json.Marshal(flowMessage)
+	// ==================== PARSING WITH JSON INSTEAD OF PROTOBUF AND CONVERSION OF IP (BYTES) TO STRING
+	flowGS := parseFlow(flowMessage)
+	b, _ := json.Marshal(flowGS)
 	reqString := string(b)
 	fmt.Println("Format --> ", reqString)
 	//b, _ := proto.Marshal(flowMessage)
@@ -153,6 +174,38 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 		Key:   key,
 		Value: sarama.ByteEncoder(b),
 	}
+}
+
+func parseFlow(f *flowmessage.FlowMessage) interface{} {
+	rate := uint64(1000)
+	ipVersion := ""
+	flowStart := f.TimeFlowStart
+	flowEnd := f.TimeFlowEnd
+	srcAddr := net.IP(f.SrcAddr).String()
+	srcIf := "Bundle-Ether90"
+	if strings.Contains(srcAddr, ":") {
+		ipVersion = "IPv6"
+	} else {
+		ipVersion = "IPv4"
+	}
+	firstSw := time.Unix(int64(flowStart), 0).UTC().Format("2006-01-02T15:04:05.000")
+	lastSw := time.Unix(int64(flowEnd), 0).UTC().Format("2006-01-02T15:04:05.000")
+	flow := Flow{
+		Exporter:  net.IP(f.SamplerAddress).String(),
+		FlowStart: firstSw,
+		FlowEnd:   lastSw,
+		Bytes:     f.Bytes * rate,
+		Packets:   f.Packets * rate,
+		SrcAddr:   srcAddr,
+		DstAddr:   net.IP(f.DstAddr).String(),
+		Protocol:  f.Proto,
+		IPVersion: ipVersion,
+		SrcPort:   f.SrcPort,
+		DstPort:   f.DstPort,
+		IfName:    srcIf,
+		SrcMask:   f.SrcNet,
+		DstMask:   f.DstNet}
+	return flow
 }
 
 func (s KafkaState) Publish(msgs []*flowmessage.FlowMessage) {
