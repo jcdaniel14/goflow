@@ -32,6 +32,19 @@ var (
 	KafkaKeying  *string
 )
 
+//SNMP Map --- Put here console output
+var interfaces = map[int]string{
+	188: "Bundle-Ether100",
+	216: "Bundle-Ether96",
+	211: "Bundle-Ether99",
+	183: "Bundle-Ether95",
+	228: "Bundle-Ether97",
+	22:  "TenGigE0/0/0/2",
+	137: "TenGigE0/2/0/11",
+	138: "TenGigE0/2/0/12",
+	171: "TenGigE0/6/0/12",
+}
+
 type KafkaState struct {
 	producer sarama.AsyncProducer
 	topic    string
@@ -177,18 +190,6 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 }
 
 func parseFlow(f *flowmessage.FlowMessage) interface{} {
-	//Template
-	var interfaces map[int]string
-	interfaces[188] = "Bundle-Ether100"
-	interfaces[216] = "Bundle-Ether96"
-	interfaces[211] = "Bundle-Ether99"
-	interfaces[183] = "Bundle-Ether95"
-	interfaces[228] = "Bundle-Ether97"
-	interfaces[22] = "TenGigE0/0/0/2"
-	interfaces[137] = "TenGigE0/2/0/11"
-	interfaces[138] = "TenGigE0/2/0/12"
-	interfaces[171] = "TenGigE0/6/0/12"
-
 	rate := uint64(1000)
 	ipVersion := ""
 	flowStart := f.TimeFlowStart
