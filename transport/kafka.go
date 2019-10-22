@@ -8,7 +8,6 @@ import (
 	flowmessage "github.com/cloudflare/goflow/pb"
 	"github.com/cloudflare/goflow/utils"
 	"net"
-	"strconv"
 	"time"
 
 	//"github.com/golang/protobuf/descriptor"
@@ -178,13 +177,25 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 }
 
 func parseFlow(f *flowmessage.FlowMessage) interface{} {
+	//Template
+	var interfaces map[int]string
+	interfaces[188] = "Bundle-Ether100"
+	interfaces[216] = "Bundle-Ether96"
+	interfaces[211] = "Bundle-Ether99"
+	interfaces[183] = "Bundle-Ether95"
+	interfaces[228] = "Bundle-Ether97"
+	interfaces[22] = "TenGigE0/0/0/2"
+	interfaces[137] = "TenGigE0/2/0/11"
+	interfaces[138] = "TenGigE0/2/0/12"
+	interfaces[171] = "TenGigE0/6/0/12"
+
 	rate := uint64(1000)
 	ipVersion := ""
 	flowStart := f.TimeFlowStart
 	flowEnd := f.TimeFlowEnd
 	srcAddr := net.IP(f.SrcAddr).String()
 
-	srcIf := strconv.Itoa(int(f.SrcIf))
+	srcIf := interfaces[int(f.SrcIf)]
 	if strings.Contains(srcAddr, ":") {
 		ipVersion = "IPv6"
 	} else {
