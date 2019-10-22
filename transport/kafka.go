@@ -45,6 +45,15 @@ var interfaces = map[int]string{
 	171: "TenGigE0/6/0/12",
 }
 
+//Exporter Map
+var nodes = map[string]string{
+	"10.101.11.211":  "rointernetgye4",
+	"10.101.11.210":  "rointernetgye3",
+	"201.218.56.129": "routercdn2gye",
+	"10.101.21.149":  "rointernetuio1",
+	"10.101.21.148":  "routercdn2uio",
+}
+
 type KafkaState struct {
 	producer sarama.AsyncProducer
 	topic    string
@@ -190,13 +199,17 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 }
 
 func parseFlow(f *flowmessage.FlowMessage) interface{} {
+	//Dictionary mapping
+	export := net.IP(f.SamplerAddress).String()
+	n := nodes[export]
+	srcIf := interfaces[int(f.SrcIf)]
+
 	rate := uint64(1000)
 	ipVersion := ""
 	flowStart := f.TimeFlowStart
 	flowEnd := f.TimeFlowEnd
 	srcAddr := net.IP(f.SrcAddr).String()
 
-	srcIf := interfaces[int(f.SrcIf)]
 	if strings.Contains(srcAddr, ":") {
 		ipVersion = "IPv6"
 	} else {
@@ -205,7 +218,7 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	firstSw := time.Unix(int64(flowStart), 0).UTC().Format("2006-01-02T15:04:05.000")
 	lastSw := time.Unix(int64(flowEnd), 0).UTC().Format("2006-01-02T15:04:05.000")
 	flow := Flow{
-		Exporter:  net.IP(f.SamplerAddress).String(),
+		Exporter:  n,
 		FlowStart: firstSw,
 		FlowEnd:   lastSw,
 		Bytes:     f.Bytes * rate,
