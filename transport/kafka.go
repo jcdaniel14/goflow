@@ -179,8 +179,8 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	// ==================== PARSING WITH JSON INSTEAD OF PROTOBUF AND CONVERSION OF IP (BYTES) TO STRING
 	flowGS := parseFlow(flowMessage)
 	b, _ := json.Marshal(flowGS)
-	reqString := string(b)
-	fmt.Println("Format --> ", reqString)
+	//reqString := string(b)
+	//fmt.Println("Format --> ", reqString)
 	//b, _ := proto.Marshal(flowMessage)
 	s.producer.Input() <- &sarama.ProducerMessage{
 		Topic: s.topic,
