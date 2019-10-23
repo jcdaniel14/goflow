@@ -203,6 +203,9 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	export := net.IP(f.SamplerAddress).String()
 	n := nodes[export]
 	srcIf := interfaces[int(f.SrcIf)]
+	if len(srcIf) == 0 {
+		srcIf = string(f.SrcIf)
+	}
 
 	rate := uint64(1000)
 	ipVersion := ""
