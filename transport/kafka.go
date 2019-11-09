@@ -8,8 +8,8 @@ import (
 	flowmessage "github.com/cloudflare/goflow/pb"
 	"github.com/cloudflare/goflow/utils"
 	"net"
+	"strconv"
 	"time"
-        "strconv"
 
 	//"github.com/golang/protobuf/descriptor"
 	"errors"
@@ -34,18 +34,24 @@ var (
 )
 
 //SNMP Map --- Put here console output
-var interfaces = map[int]string{
-        170: "TenGigE0/6/0/11",
-        232: "Bundle-Ether98",
-	188: "Bundle-Ether100",
-	216: "Bundle-Ether96",
-	211: "Bundle-Ether99",
-	183: "Bundle-Ether95",
-	228: "Bundle-Ether97",
-	22:  "TenGigE0/0/0/2",
-	137: "TenGigE0/2/0/11",
-	138: "TenGigE0/2/0/12",
-	171: "TenGigE0/6/0/12",
+var interfaces = map[string]string{
+	"rointernetgye4:170": "TenGigE0/6/0/11",
+	"rointernetgye4:232": "Bundle-Ether98",
+	"rointernetgye4:188": "Bundle-Ether100",
+	"rointernetgye4:216": "Bundle-Ether96",
+	"rointernetgye4:211": "Bundle-Ether99",
+	"rointernetgye4:183": "Bundle-Ether95",
+	"rointernetgye4:228": "Bundle-Ether97",
+	"rointernetgye4:22":  "TenGigE0/0/0/2",
+	"rointernetgye4:137": "TenGigE0/2/0/11",
+	"rointernetgye4:138": "TenGigE0/2/0/12",
+	"rointernetgye4:171": "TenGigE0/6/0/12",
+	"rointernetgye4:127": "TenGigE0/2/0/1",
+
+	"rointernetgye3:143": "Bundle-Ether250",
+	"rointernetgye3:134": "Bundle-Ether98",
+	"rointernetgye3:120": "Bundle-Ether200",
+	"rointernetgye3:38":  "TenGigE0/2/0/10",
 }
 
 //Exporter Map
@@ -205,7 +211,7 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	//Dictionary mapping
 	export := net.IP(f.SamplerAddress).String()
 	n := nodes[export]
-	srcIf := interfaces[int(f.SrcIf)]
+	srcIf := interfaces[n+":"+strconv.Itoa(int(f.SrcIf))]
 	if len(srcIf) == 0 {
 		srcIf = strconv.Itoa(int(f.SrcIf))
 	}
