@@ -9,6 +9,7 @@ import (
 	"github.com/cloudflare/goflow/utils"
 	"net"
 	"time"
+        "strconv"
 
 	//"github.com/golang/protobuf/descriptor"
 	"errors"
@@ -34,6 +35,8 @@ var (
 
 //SNMP Map --- Put here console output
 var interfaces = map[int]string{
+        170: "TenGigE0/6/0/11",
+        232: "Bundle-Ether98",
 	188: "Bundle-Ether100",
 	216: "Bundle-Ether96",
 	211: "Bundle-Ether99",
@@ -204,7 +207,7 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	n := nodes[export]
 	srcIf := interfaces[int(f.SrcIf)]
 	if len(srcIf) == 0 {
-		srcIf = string(f.SrcIf)
+		srcIf = strconv.Itoa(int(f.SrcIf))
 	}
 
 	rate := uint64(1000)
