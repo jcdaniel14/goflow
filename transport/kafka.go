@@ -52,6 +52,8 @@ var interfaces = map[string]string{
 	"rointernetgye3:134": "Bundle-Ether98",
 	"rointernetgye3:120": "Bundle-Ether200",
 	"rointernetgye3:38":  "TenGigE0/2/0/10",
+
+	"routercdn2uio:274": "Bundle-Ether80",
 }
 
 //Exporter Map
