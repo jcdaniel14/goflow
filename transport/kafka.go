@@ -47,6 +47,7 @@ var interfaces = map[string]string{
 	"rointernetgye4:138": "TenGigE0/2/0/12",
 	"rointernetgye4:171": "TenGigE0/6/0/12",
 	"rointernetgye4:127": "TenGigE0/2/0/1",
+	"rointernetgye4:233": "Bundle-Ether93",
 
 	"rointernetgye3:143": "Bundle-Ether250",
 	"rointernetgye3:134": "Bundle-Ether98",
@@ -57,10 +58,19 @@ var interfaces = map[string]string{
 	"routercdn2uio:249": "Bundle-Ether112",
 	"routercdn2uio:256": "BVI2300",
 	"routercdn2uio:243": "BVI2201",
+	"routercdn2uio:283": "BVI2301",
 	"routercdn2uio:268": "Bundle-Ether114.2100",
 	"routercdn2uio:269": "BVI2202",
 	"routercdn2uio:265": "Bundle-Ether30",
 	"routercdn2uio:267": "Bundle-Ether114",
+
+	"rointernetuio1:91":  "Bundle-Ether100",
+	"rointernetuio1:109": "Bundle-Ether93",
+	"rointernetuio1:92":  "Bundle-Ether200",
+	"rointernetuio1:119": "TenGigE0/3/0/1",
+	"rointernetuio1:107": "Bundle-Ether90",
+	"rointernetuio1:65":  "TenGigE0/7/0/3",
+	"rointernetuio1:50":  "TenGigE0/6/0/4",
 }
 
 //Exporter Map
