@@ -246,6 +246,18 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	} else {
 		ipVersion = "IPv4"
 	}
+
+	//============== Resolve Mask 0 Bug
+	srcMask := f.SrcNet
+	dstMask := f.DstNet
+	if srcMask == 0 {
+		srcMask = 32
+	}
+	if dstMask == 0 {
+		dstMask = 32
+	}
+	//============== END
+
 	firstSw := time.Unix(int64(flowStart), 0).UTC().Format("2006-01-02T15:04:05.000")
 	lastSw := time.Unix(int64(flowEnd), 0).UTC().Format("2006-01-02T15:04:05.000")
 	flow := Flow{
@@ -261,8 +273,8 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 		SrcPort:   f.SrcPort,
 		DstPort:   f.DstPort,
 		IfName:    srcIf,
-		SrcMask:   f.SrcNet,
-		DstMask:   f.DstNet}
+		SrcMask:   srcMask,
+		DstMask:   dstMask}
 	return flow
 }
 
