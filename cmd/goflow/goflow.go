@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/cloudflare/goflow/transport"
 	"github.com/cloudflare/goflow/utils"
-	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
 
 	"net/http"
@@ -50,7 +48,6 @@ var (
 	TemplatePath = flag.String("templates.path", "/templates", "NetFlow/IPFIX templates list")
 
 	Version = flag.Bool("v", false, "Print version")
-	Eclient *elastic.Client
 )
 
 func init() {
@@ -64,19 +61,19 @@ func httpServer(state *utils.StateNetFlow) {
 }
 
 func main() {
-	ctx := context.Background()
-	Eclient, err := elastic.NewClient(elastic.SetURL("http://172.24.4.154:9200"))
-	if err != nil {
-		// Handle error
-		panic(err)
-	}
+	//ctx := context.Background()
+	//Eclient, err := elastic.NewClient(elastic.SetURL("http://172.24.4.154:9200"))
+	//if err != nil {
+	//	// Handle error
+	//	panic(err)
+	//}
 	// Ping the Elasticsearch server to get e.g. the version number
-	info, code, err := Eclient.Ping("http://172.24.4.154:9200").Do(ctx)
-	if err != nil {
-		// Handle error
-		panic(err)
-	}
-	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+	//info, code, err := Eclient.Ping("http://172.24.4.154:9200").Do(ctx)
+	//if err != nil {
+	//	// Handle error
+	//	panic(err)
+	//}
+	//fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
 
 	flag.Parse()
 
@@ -168,4 +165,3 @@ func main() {
 	}
 	wg.Wait()
 }
-
