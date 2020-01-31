@@ -101,11 +101,11 @@ type KafkaState struct {
 }
 
 type Flow struct {
-	Exporter  string `json:"exporter"`
-	FlowStart string `json:"first_switched"`
-	FlowEnd   string `json:"last_switched"`
-	Bytes     uint64 `json:"bytes"`
-	Packets   uint64 `json:"packets"`
+	Exporter string `json:"exporter"`
+	//FlowStart string `json:"first_switched"`
+	FlowEnd string `json:"last_switched"`
+	Bytes   uint64 `json:"bytes"`
+	//Packets   uint64 `json:"packets"`
 	SrcAddr   string `json:"src_addr"`
 	DstAddr   string `json:"dst_addr"`
 	Protocol  uint32 `json:"protocol"`
@@ -113,8 +113,9 @@ type Flow struct {
 	SrcPort   uint32 `json:"src_port"`
 	DstPort   uint32 `json:"dst_port"`
 	IfName    string `json:"input_ifname"`
-	SrcMask   uint32 `json:"src_mask"`
-	DstMask   uint32 `json:"dst_mask"`
+	//SrcMask   uint32 `json:"src_mask"`
+	//DstMask   uint32 `json:"dst_mask"`
+	Gate string `json:"gate"`
 }
 
 func RegisterFlags() {
@@ -248,7 +249,7 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 
 	rate := uint64(1000)
 	ipVersion := ""
-	flowStart := f.TimeFlowStart
+	//flowStart := f.TimeFlowStart
 	flowEnd := f.TimeFlowEnd
 	srcAddr := net.IP(f.SrcAddr).String()
 
@@ -269,14 +270,17 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 	}
 	//============== END
 
-	firstSw := time.Unix(int64(flowStart), 0).UTC().Format("2006-01-02T15:04:05.000")
+	//Gate
+	Gate := n + ":" + srcIf
+
+	//firstSw := time.Unix(int64(flowStart), 0).UTC().Format("2006-01-02T15:04:05.000")
 	lastSw := time.Unix(int64(flowEnd), 0).UTC().Format("2006-01-02T15:04:05.000")
 	flow := Flow{
-		Exporter:  n,
-		FlowStart: firstSw,
-		FlowEnd:   lastSw,
-		Bytes:     f.Bytes * rate,
-		Packets:   f.Packets * rate,
+		Exporter: n,
+		//FlowStart: firstSw,
+		FlowEnd: lastSw,
+		Bytes:   f.Bytes * rate,
+		//Packets:   f.Packets * rate,
 		SrcAddr:   srcAddr,
 		DstAddr:   net.IP(f.DstAddr).String(),
 		Protocol:  f.Proto,
@@ -284,8 +288,10 @@ func parseFlow(f *flowmessage.FlowMessage) interface{} {
 		SrcPort:   f.SrcPort,
 		DstPort:   f.DstPort,
 		IfName:    srcIf,
-		SrcMask:   srcMask,
-		DstMask:   dstMask}
+		Gate:      Gate,
+	}
+	//SrcMask:   srcMask,
+	//DstMask:   dstMask}
 	return flow
 }
 
