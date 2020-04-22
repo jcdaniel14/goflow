@@ -84,7 +84,7 @@ var interfaces = map[string]string{
 	"rointernetuio1:65":  "TenGigE0/7/0/3",
 	"rointernetuio1:50":  "TenGigE0/6/0/4",
 	"rointernetuio1:122": "Bundle-Ether98",
-        "rointernetuio1:161": "TenGigE0/4/0/4",
+	"rointernetuio1:161": "TenGigE0/4/0/4",
 }
 
 //Exporter Map
