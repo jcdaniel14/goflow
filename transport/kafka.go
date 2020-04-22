@@ -35,6 +35,7 @@ var (
 
 //SNMP Map --- Put here console output
 var interfaces = map[string]string{
+	"rointernetgye4:25":"TenGigE0/0/0/5",
 	"rointernetgye4:170": "TenGigE0/6/0/11",
 	"rointernetgye4:232": "Bundle-Ether98",
 	"rointernetgye4:188": "Bundle-Ether100",
@@ -49,6 +50,8 @@ var interfaces = map[string]string{
 	"rointernetgye4:127": "TenGigE0/2/0/1",
 	"rointernetgye4:233": "Bundle-Ether93",
 	"rointernetgye4:234": "Bundle-Ether200",
+	"rointernetgye4:235": "Bundle-Ether250",
+	"rointernetgye4:263": "Bundle-Ether252",
 
 	"rointernetgye3:143": "Bundle-Ether250",
 	"rointernetgye3:134": "Bundle-Ether98",
@@ -75,6 +78,7 @@ var interfaces = map[string]string{
 	"routercdn2gye:276": "Bundle-Ether108",
 	"routercdn2gye:305": "Bundle-Ether30",
 	"routercdn2gye:311": "Bundle-Ether107",
+	"routercdn2gye:443": "BVI2302",
 
 	"rointernetuio1:91":  "Bundle-Ether100",
 	"rointernetuio1:109": "Bundle-Ether93",
@@ -85,6 +89,10 @@ var interfaces = map[string]string{
 	"rointernetuio1:50":  "TenGigE0/6/0/4",
 	"rointernetuio1:122": "Bundle-Ether98",
 	"rointernetuio1:161": "TenGigE0/4/0/4",
+	"rointernetuio1:174": "Bundle-Ether95",
+
+	"pe1asrgyes:592": "BVI90",
+	"pe1asruios:695": "BVI90",
 }
 
 //Exporter Map
@@ -94,6 +102,7 @@ var nodes = map[string]string{
 	"201.218.56.129": "routercdn2gye",
 	"10.101.21.149":  "rointernetuio1",
 	"10.101.21.148":  "routercdn2uio",
+        "10.101.11.226":  "pe1asrgyes",
 }
 
 type KafkaState struct {
@@ -230,15 +239,37 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	}
 	// ==================== PARSING WITH JSON INSTEAD OF PROTOBUF AND CONVERSION OF IP (BYTES) TO STRING
 	flowGS := parseFlow(flowMessage)
-	b, _ := json.Marshal(flowGS)
+	// ==================== Exclude unwanted gates
+	if flowGS.Exporter == "pe1asrgyes" || flowGS.Exporter == "pe1asruios" {
+		if flowGS.IfName == "BVI90" {
+			b, _ := json.Marshal(flowGS)
+			s.producer.Input() <- &sarama.ProducerMessage{
+				Topic: s.topic,
+				Key:   key,
+				Value: sarama.ByteEncoder(b),
+			}
+		}
+	} else {
+		b, _ := json.Marshal(flowGS)
+		s.producer.Input() <- &sarama.ProducerMessage{
+			Topic: s.topic,
+			Key:   key,
+			Value: sarama.ByteEncoder(b),
+		}
+	}
+
+
 	//reqString := string(b)
 	//fmt.Println("Format --> ", reqString)
 	//b, _ := proto.Marshal(flowMessage)
-	s.producer.Input() <- &sarama.ProducerMessage{
-		Topic: s.topic,
-		Key:   key,
-		Value: sarama.ByteEncoder(b),
-	}
+
+
+	//b, _ := json.Marshal(flowGS)
+	//s.producer.Input() <- &sarama.ProducerMessage{
+	//	Topic: s.topic,
+	//	Key:   key,
+	//	Value: sarama.ByteEncoder(b),
+	//}
 }
 
 func parseFlow(f *flowmessage.FlowMessage) interface{} {
