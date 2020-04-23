@@ -272,7 +272,7 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	//}
 }
 
-func parseFlow(f *flowmessage.FlowMessage) interface{} {
+func parseFlow(f *flowmessage.FlowMessage) Flow {
 	//Dictionary mapping
 	export := net.IP(f.SamplerAddress).String()
 	n := nodes[export]
