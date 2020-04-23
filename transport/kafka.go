@@ -102,7 +102,8 @@ var nodes = map[string]string{
 	"201.218.56.129": "routercdn2gye",
 	"10.101.21.149":  "rointernetuio1",
 	"10.101.21.148":  "routercdn2uio",
-        "10.101.11.226":  "pe1asrgyes",
+	"10.101.11.226":  "pe1asrgyes",
+	"10.101.21.208":  "pe1asruios",
 }
 
 type KafkaState struct {
