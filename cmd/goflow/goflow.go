@@ -108,7 +108,7 @@ func main() {
 		Logger:    log.StandardLogger(),
 	}
 
-	go httpServer(sNF)
+	//go httpServer(sNF)
 
 	if *EnableKafka {
 		kafkaState, err := transport.StartKafkaProducerFromArgs(log.StandardLogger())
