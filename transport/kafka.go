@@ -35,6 +35,7 @@ var (
 
 //SNMP Map --- Put here console output
 var interfaces = map[string]string{
+	"rointernetgye4:24":"TenGigE0/0/0/4",
 	"rointernetgye4:25":"TenGigE0/0/0/5",
 	"rointernetgye4:170": "TenGigE0/6/0/11",
 	"rointernetgye4:232": "Bundle-Ether98",
@@ -79,6 +80,7 @@ var interfaces = map[string]string{
 	"routercdn2gye:305": "Bundle-Ether30",
 	"routercdn2gye:311": "Bundle-Ether107",
 	"routercdn2gye:443": "BVI2302",
+	"routercdn2gye:448": "Bundle-Ether50",
 
 	"rointernetuio1:91":  "Bundle-Ether100",
 	"rointernetuio1:109": "Bundle-Ether93",
