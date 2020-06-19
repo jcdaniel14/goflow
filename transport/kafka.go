@@ -95,6 +95,8 @@ var interfaces = map[string]string{
 
 	"pe1asrgyes:592": "BVI90",
 	"pe1asruios:695": "BVI90",
+
+	"pe2asrgyedc:231": "Bundle-Ether10",
 }
 
 //Exporter Map
@@ -106,6 +108,7 @@ var nodes = map[string]string{
 	"10.101.21.148":  "routercdn2uio",
 	"10.101.11.226":  "pe1asrgyes",
 	"10.101.21.208":  "pe1asruios",
+	"10.101.107.175": "pe2asrgyedc",
 }
 
 type KafkaState struct {
@@ -252,7 +255,17 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 				Value: sarama.ByteEncoder(b),
 			}
 		}
-	} else {
+	} else if flowGS.Exporter == "pe2asrgyedc" {
+		if flowGS.IfName == "Bundle-Ether10" {
+			b, _ := json.Marshal(flowGS)
+			s.producer.Input() <- &sarama.ProducerMessage{
+				Topic: s.topic,
+				Key:   key,
+				Value: sarama.ByteEncoder(b),
+			}
+		}
+	}
+	else {
 		b, _ := json.Marshal(flowGS)
 		s.producer.Input() <- &sarama.ProducerMessage{
 			Topic: s.topic,
