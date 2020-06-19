@@ -264,8 +264,7 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 				Value: sarama.ByteEncoder(b),
 			}
 		}
-	}
-	else {
+	} else {
 		b, _ := json.Marshal(flowGS)
 		s.producer.Input() <- &sarama.ProducerMessage{
 			Topic: s.topic,
