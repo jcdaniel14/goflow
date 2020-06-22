@@ -69,59 +69,6 @@ type Flow struct {
 	DstMask   uint32 `json:"flow.dst_mask"`
 }
 
-//func sendToLogstash(msg *flowmessage.FlowMessage) {
-//	ctx := context.Background()
-//	// Ping the Elasticsearch server to get e.g. the version number
-//	info, code, err := gl.Eclient.Ping("http://172.24.4.154:9200").Do(ctx)
-//
-//	if err != nil {
-//		// Handle error
-//		panic(err)
-//	}
-//
-//	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
-//
-//	t := time.Now().Local()
-//	myIndex := "gsflow-" + t.Format("2006-01-02")
-//	rate := uint64(1000)
-//	ipVersion := ""
-//	exporter := net.IP(msg.SamplerAddress).String()
-//	flowStart := msg.TimeFlowStart
-//	flowEnd := msg.TimeFlowEnd
-//	srcAddr := net.IP(msg.SrcAddr).String()
-//	dstAddr := net.IP(msg.DstAddr).String()
-//	proto := msg.Proto
-//	srcPort := msg.SrcPort
-//	dstPort := msg.DstPort
-//	srcIf := "Bundle-Ether90"
-//	srcMask := msg.SrcNet
-//	dstMask := msg.DstNet
-//	if strings.Contains(srcAddr, ":") {
-//		ipVersion = "IPv6"
-//	} else {
-//		ipVersion = "IPv4"
-//	}
-//	firstSw := time.Unix(int64(flowStart), 0).UTC().Format("2006-01-02T15:04:05.000")
-//	lastSw := time.Unix(int64(flowEnd), 0).UTC().Format("2006-01-02T15:04:05.000")
-//
-//	flow := Flow{Exporter: exporter, FlowStart: firstSw, FlowEnd: lastSw, Bytes: msg.Bytes * rate, Packets: msg.Packets * rate, SrcAddr: srcAddr, DstAddr: dstAddr, Protocol: proto, IPVersion: ipVersion, SrcPort: srcPort, DstPort: dstPort, IfName: srcIf, SrcMask: srcMask, DstMask: dstMask}
-//	put1, err := gl.Eclient.Index().
-//		Index(myIndex).
-//		Type("_doc").
-//		BodyJson(flow).
-//		Do(ctx)
-//	if err != nil {
-//		panic(err)
-//	}
-//	fmt.Printf("Indexed flow %s to index %s, type %s\n", put1.Id, put1.Index, put1.Type)
-//
-//	// Flush to make sure the documents got written.
-//	_, err = gl.Eclient.Flush().Index(myIndex).Do(ctx)
-//	if err != nil {
-//		panic(err)
-//	}
-//}
-
 func (s *DefaultLogTransport) Publish(msgs []*flowmessage.FlowMessage) {
 
 	for _, msg := range msgs {

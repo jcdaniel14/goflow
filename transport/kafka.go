@@ -96,10 +96,10 @@ var interfaces = map[string]string{
 	"pe1asrgyes:592": "BVI90",
 	"pe1asruios:695": "BVI90",
 
-	"pe2asrgyedc:231": "Bundle-Ether10",
+	// "pe2asrgyedc:231": "Bundle-Ether10",
 }
 
-//Exporter Map
+//Exporter
 var nodes = map[string]string{
 	"10.101.11.211":  "rointernetgye4",
 	"10.101.11.210":  "rointernetgye3",
@@ -108,7 +108,7 @@ var nodes = map[string]string{
 	"10.101.21.148":  "routercdn2uio",
 	"10.101.11.226":  "pe1asrgyes",
 	"10.101.21.208":  "pe1asruios",
-	"10.101.107.175": "pe2asrgyedc",
+	// "10.101.107.175": "pe2asrgyedc",
 }
 
 type KafkaState struct {
