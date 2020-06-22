@@ -96,7 +96,7 @@ var interfaces = map[string]string{
 	"pe1asrgyes:592": "BVI90",
 	"pe1asruios:695": "BVI90",
 
-	// "pe2asrgyedc:231": "Bundle-Ether10",
+	"pe2asrgyedc:231": "Bundle-Ether10",
 }
 
 //Exporter
