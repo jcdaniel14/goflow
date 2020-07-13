@@ -52,22 +52,22 @@ type DefaultLogTransport struct {
 }
 
 // Flow Structure needed to send to ElasticSearch
-type Flow struct {
-	Exporter  string `json:"flow.exporter"`
-	FlowStart string `json:"flow.first_switched"`
-	FlowEnd   string `json:"flow.last_switched"`
-	Bytes     uint64 `json:"flow.bytes"`
-	Packets   uint64 `json:"flow.packets"`
-	SrcAddr   string `json:"flow.src_addr"`
-	DstAddr   string `json:"flow.dst_addr"`
-	Protocol  uint32 `json:"flow.protocol"`
-	IPVersion string `json:"flow.ip_version"`
-	SrcPort   uint32 `json:"flow.src_port"`
-	DstPort   uint32 `json:"flow.dst_port"`
-	IfName    string `json:"flow.input_ifname"`
-	SrcMask   uint32 `json:"flow.src_mask"`
-	DstMask   uint32 `json:"flow.dst_mask"`
-}
+//type Flow struct {
+//	Exporter  string `json:"flow.exporter"`
+//	FlowStart string `json:"flow.first_switched"`
+//	FlowEnd   string `json:"flow.last_switched"`
+//	Bytes     uint64 `json:"flow.bytes"`
+//	Packets   uint64 `json:"flow.packets"`
+//	SrcAddr   string `json:"flow.src_addr"`
+//	DstAddr   string `json:"flow.dst_addr"`
+//	Protocol  uint32 `json:"flow.protocol"`
+//	IPVersion string `json:"flow.ip_version"`
+//	SrcPort   uint32 `json:"flow.src_port"`
+//	DstPort   uint32 `json:"flow.dst_port"`
+//	IfName    string `json:"flow.input_ifname"`
+//	SrcMask   uint32 `json:"flow.src_mask"`
+//	DstMask   uint32 `json:"flow.dst_mask"`
+//}
 
 func (s *DefaultLogTransport) Publish(msgs []*flowmessage.FlowMessage) {
 
