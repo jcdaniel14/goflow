@@ -341,7 +341,7 @@ func parseFlow(f *flowmessage.FlowMessage) Flow {
 		IfName:    srcIf,
 		Gate:      Gate,
 		Direction: f.FlowDirection,
-		TCPFlag: f.TCPFlags
+		TCPFlag: f.TCPFlags,
 	}
 	//SrcMask:   srcMask,
 	//DstMask:   dstMask}
