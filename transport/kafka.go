@@ -134,7 +134,7 @@ type Flow struct {
 	//SrcMask   uint32 `json:"src_mask"`
 	//DstMask   uint32 `json:"dst_mask"`
 	Gate string `json:"gate"`
-	Direction uint32 `json:direction`
+	Direction uint32 `json:"direction"`
 }
 
 func RegisterFlags() {
