@@ -135,6 +135,7 @@ type Flow struct {
 	//DstMask   uint32 `json:"dst_mask"`
 	Gate string `json:"gate"`
 	Direction uint32 `json:"direction"`
+	TCPFlag uint32 `json:"tcp_flag"`
 }
 
 func RegisterFlags() {
@@ -340,6 +341,7 @@ func parseFlow(f *flowmessage.FlowMessage) Flow {
 		IfName:    srcIf,
 		Gate:      Gate,
 		Direction: f.FlowDirection,
+		TCPFlag: f.TCPFlags
 	}
 	//SrcMask:   srcMask,
 	//DstMask:   dstMask}
