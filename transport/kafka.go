@@ -97,6 +97,8 @@ var interfaces = map[string]string{
 	"pe1asruios:695": "BVI90",
 
 	"pe2asrgyedc:231": "Bundle-Ether10",
+
+	"pe1asruiod:867":"BVI90",
 }
 
 //Exporter
@@ -109,6 +111,7 @@ var nodes = map[string]string{
 	"10.101.11.226":  "pe1asrgyes",
 	"10.101.21.208":  "pe1asruios",
 	"10.101.107.175": "pe2asrgyedc",
+	"10.101.21.219": "pe1asruiod",
 }
 
 type KafkaState struct {
@@ -247,8 +250,9 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	}
 	// ==================== PARSING WITH JSON INSTEAD OF PROTOBUF AND CONVERSION OF IP (BYTES) TO STRING
 	flowGS := parseFlow(flowMessage)
+
 	// ==================== Exclude unwanted gates
-	if flowGS.Exporter == "pe1asrgyes" || flowGS.Exporter == "pe1asruios" {
+	if flowGS.Exporter == "pe1asrgyes" || flowGS.Exporter == "pe1asruios" || flowGS.Exporter == "pe1asruiod" {
 		if flowGS.IfName == "BVI90" {
 			b, _ := json.Marshal(flowGS)
 			s.producer.Input() <- &sarama.ProducerMessage{
@@ -293,6 +297,9 @@ func parseFlow(f *flowmessage.FlowMessage) Flow {
 	//Dictionary mapping
 	export := net.IP(f.SamplerAddress).String()
 	n := nodes[export]
+	if len(n) == 0 {
+		n = export
+	}
 	srcIf := interfaces[n+":"+strconv.Itoa(int(f.SrcIf))]
 	if len(srcIf) == 0 {
 		srcIf = strconv.Itoa(int(f.SrcIf))
