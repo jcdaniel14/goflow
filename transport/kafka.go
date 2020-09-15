@@ -53,6 +53,8 @@ var interfaces = map[string]string{
 	"rointernetgye4:234": "Bundle-Ether200",
 	"rointernetgye4:235": "Bundle-Ether250",
 	"rointernetgye4:263": "Bundle-Ether252",
+	"rointernetgye4:265": "HundredGigE0/4/0/3.500",
+	"rointernetgye4:266": "HundredGigE0/4/0/3.510",
 
 	"rointernetgye3:143": "Bundle-Ether250",
 	"rointernetgye3:134": "Bundle-Ether98",
