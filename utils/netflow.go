@@ -3,14 +3,15 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/cloudflare/goflow/decoders/netflow"
-	flowmessage "github.com/cloudflare/goflow/pb"
-	"github.com/cloudflare/goflow/producer"
-	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/cloudflare/goflow/v3/decoders/netflow"
+	flowmessage "github.com/cloudflare/goflow/v3/pb"
+	"github.com/cloudflare/goflow/v3/producer"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type TemplateSystem struct {
@@ -69,21 +70,30 @@ func (s *StateNetFlow) DecodeFlow(msg interface{}) error {
 
 	s.templateslock.RLock()
 	templates, ok := s.templates[key]
+	s.templateslock.RUnlock()
 	if !ok {
 		templates = &TemplateSystem{
 			templates: netflow.CreateTemplateSystem(),
 			key:       key,
 		}
+		s.templateslock.Lock()
 		s.templates[key] = templates
+		s.templateslock.Unlock()
 	}
-	s.templateslock.RUnlock()
 	s.samplinglock.RLock()
 	sampling, ok := s.sampling[key]
+	s.samplinglock.RUnlock()
 	if !ok {
 		sampling = producer.CreateSamplingSystem()
+		s.samplinglock.Lock()
 		s.sampling[key] = sampling
+		s.samplinglock.Unlock()
 	}
-	s.samplinglock.RUnlock()
+
+	ts := uint64(time.Now().UTC().Unix())
+	if pkt.SetTime {
+		ts = uint64(pkt.RecvTime.UTC().Unix())
+	}
 
 	timeTrackStart := time.Now()
 	msgDec, err := netflow.DecodeMessage(buf, templates)
@@ -205,7 +215,7 @@ func (s *StateNetFlow) DecodeFlow(msg interface{}) error {
 		flowMessageSet, err = producer.ProcessMessageNetFlow(msgDecConv, sampling)
 
 		for _, fmsg := range flowMessageSet {
-			fmsg.TimeReceived = uint64(time.Now().UTC().Unix())
+			fmsg.TimeReceived = ts
 			fmsg.SamplerAddress = samplerAddress
 			timeDiff := fmsg.TimeReceived - fmsg.TimeFlowEnd
 			NetFlowTimeStatsSum.With(
@@ -298,7 +308,7 @@ func (s *StateNetFlow) DecodeFlow(msg interface{}) error {
 		flowMessageSet, err = producer.ProcessMessageNetFlow(msgDecConv, sampling)
 
 		for _, fmsg := range flowMessageSet {
-			fmsg.TimeReceived = uint64(time.Now().UTC().Unix())
+			fmsg.TimeReceived = ts
 			fmsg.SamplerAddress = samplerAddress
 			timeDiff := fmsg.TimeReceived - fmsg.TimeFlowEnd
 			NetFlowTimeStatsSum.With(

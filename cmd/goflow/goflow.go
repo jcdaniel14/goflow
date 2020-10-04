@@ -3,18 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
-
-	"github.com/cloudflare/goflow/transport"
-	"github.com/cloudflare/goflow/utils"
-	log "github.com/sirupsen/logrus"
-
-	"net/http"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
 	"sync"
+
+	"github.com/cloudflare/goflow/v3/transport"
+	"github.com/cloudflare/goflow/v3/utils"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -42,6 +39,7 @@ var (
 	LogFmt   = flag.String("logfmt", "normal", "Log formatter")
 
 	EnableKafka = flag.Bool("kafka", true, "Enable Kafka")
+	FixedLength = flag.Bool("proto.fixedlen", false, "Enable fixed length protobuf")
 	MetricsAddr = flag.String("metrics.addr", ":8080", "Metrics address")
 	MetricsPath = flag.String("metrics.path", "/metrics", "Metrics path")
 
@@ -61,20 +59,6 @@ func httpServer(state *utils.StateNetFlow) {
 }
 
 func main() {
-	//ctx := context.Background()
-	//Eclient, err := elastic.NewClient(elastic.SetURL("http://172.24.4.154:9200"))
-	//if err != nil {
-	//	// Handle error
-	//	panic(err)
-	//}
-	// Ping the Elasticsearch server to get e.g. the version number
-	//info, code, err := Eclient.Ping("http://172.24.4.154:9200").Do(ctx)
-	//if err != nil {
-	//	// Handle error
-	//	panic(err)
-	//}
-	//fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
-
 	flag.Parse()
 
 	if *Version {
@@ -84,16 +68,19 @@ func main() {
 
 	lvl, _ := log.ParseLevel(*LogLevel)
 	log.SetLevel(lvl)
+
+	var defaultTransport utils.Transport
+	defaultTransport = &utils.DefaultLogTransport{}
+
 	switch *LogFmt {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
+		defaultTransport = &utils.DefaultJSONTransport{}
 	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	log.Info("Starting GoFlow")
-
-	defaultTransport := &utils.DefaultLogTransport{}
 
 	sSFlow := &utils.StateSFlow{
 		Transport: defaultTransport,
@@ -108,13 +95,15 @@ func main() {
 		Logger:    log.StandardLogger(),
 	}
 
-	//go httpServer(sNF)
+	go httpServer(sNF)
 
 	if *EnableKafka {
 		kafkaState, err := transport.StartKafkaProducerFromArgs(log.StandardLogger())
 		if err != nil {
 			log.Fatal(err)
 		}
+		kafkaState.FixedLengthProto = *FixedLength
+
 		sSFlow.Transport = kafkaState
 		sNFL.Transport = kafkaState
 		sNF.Transport = kafkaState

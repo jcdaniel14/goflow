@@ -3,14 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/cloudflare/goflow/transport"
-	"github.com/cloudflare/goflow/utils"
-	log "github.com/sirupsen/logrus"
+	"net/http"
 	"os"
 	"runtime"
 
+	"github.com/cloudflare/goflow/v3/transport"
+	"github.com/cloudflare/goflow/v3/utils"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -27,6 +27,7 @@ var (
 	LogFmt   = flag.String("logfmt", "normal", "Log formatter")
 
 	EnableKafka  = flag.Bool("kafka", true, "Enable Kafka")
+	FixedLength  = flag.Bool("proto.fixedlen", false, "Enable fixed length protobuf")
 	MetricsAddr  = flag.String("metrics.addr", ":8080", "Metrics address")
 	MetricsPath  = flag.String("metrics.path", "/metrics", "Metrics path")
 	TemplatePath = flag.String("templates.path", "/templates", "NetFlow/IPFIX templates list")
@@ -54,9 +55,14 @@ func main() {
 
 	lvl, _ := log.ParseLevel(*LogLevel)
 	log.SetLevel(lvl)
+
+	var defaultTransport utils.Transport
+	defaultTransport = &utils.DefaultLogTransport{}
+
 	switch *LogFmt {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
+		defaultTransport = &utils.DefaultJSONTransport{}
 	}
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -64,7 +70,7 @@ func main() {
 	log.Info("Starting GoFlow")
 
 	s := &utils.StateNetFlow{
-		Transport: &utils.DefaultLogTransport{},
+		Transport: defaultTransport,
 		Logger:    log.StandardLogger(),
 	}
 
@@ -75,6 +81,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		kafkaState.FixedLengthProto = *FixedLength
 		s.Transport = kafkaState
 	}
 	log.WithFields(log.Fields{

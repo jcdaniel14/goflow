@@ -2,11 +2,12 @@ package utils
 
 import (
 	"bytes"
-	"github.com/cloudflare/goflow/decoders/netflowlegacy"
-	flowmessage "github.com/cloudflare/goflow/pb"
-	"github.com/cloudflare/goflow/producer"
-	"github.com/prometheus/client_golang/prometheus"
 	"time"
+
+	"github.com/cloudflare/goflow/v3/decoders/netflowlegacy"
+	flowmessage "github.com/cloudflare/goflow/v3/pb"
+	"github.com/cloudflare/goflow/v3/producer"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type StateNFLegacy struct {
@@ -21,6 +22,11 @@ func (s *StateNFLegacy) DecodeFlow(msg interface{}) error {
 	samplerAddress := pkt.Src
 	if samplerAddress.To4() != nil {
 		samplerAddress = samplerAddress.To4()
+	}
+
+	ts := uint64(time.Now().UTC().Unix())
+	if pkt.SetTime {
+		ts = uint64(pkt.RecvTime.UTC().Unix())
 	}
 
 	timeTrackStart := time.Now()
@@ -67,7 +73,7 @@ func (s *StateNFLegacy) DecodeFlow(msg interface{}) error {
 		Observe(float64((timeTrackStop.Sub(timeTrackStart)).Nanoseconds()) / 1000)
 
 	for _, fmsg := range flowMessageSet {
-		fmsg.TimeReceived = uint64(time.Now().UTC().Unix())
+		fmsg.TimeReceived = ts
 		fmsg.SamplerAddress = samplerAddress
 	}
 

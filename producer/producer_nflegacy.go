@@ -3,9 +3,10 @@ package producer
 import (
 	"encoding/binary"
 	"errors"
-	"github.com/cloudflare/goflow/decoders/netflowlegacy"
-	flowmessage "github.com/cloudflare/goflow/pb"
 	"net"
+
+	"github.com/cloudflare/goflow/v3/decoders/netflowlegacy"
+	flowmessage "github.com/cloudflare/goflow/v3/pb"
 )
 
 func ConvertNetFlowLegacyRecord(baseTime uint32, uptime uint32, record netflowlegacy.RecordsNetFlowV5) *flowmessage.FlowMessage {
@@ -36,8 +37,8 @@ func ConvertNetFlowLegacyRecord(baseTime uint32, uptime uint32, record netflowle
 	flowMessage.Proto = uint32(record.Proto)
 	flowMessage.TCPFlags = uint32(record.TCPFlags)
 	flowMessage.IPTos = uint32(record.Tos)
-	flowMessage.SrcIf = uint32(record.Input)
-	flowMessage.DstIf = uint32(record.Output)
+	flowMessage.InIf = uint32(record.Input)
+	flowMessage.OutIf = uint32(record.Output)
 	flowMessage.SrcPort = uint32(record.SrcPort)
 	flowMessage.DstPort = uint32(record.DstPort)
 	flowMessage.Packets = uint64(record.DPkts)

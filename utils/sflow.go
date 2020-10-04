@@ -2,23 +2,31 @@ package utils
 
 import (
 	"bytes"
-	"github.com/cloudflare/goflow/decoders/sflow"
-	flowmessage "github.com/cloudflare/goflow/pb"
-	"github.com/cloudflare/goflow/producer"
-	"github.com/prometheus/client_golang/prometheus"
 	"net"
 	"time"
+
+	"github.com/cloudflare/goflow/v3/decoders/sflow"
+	flowmessage "github.com/cloudflare/goflow/v3/pb"
+	"github.com/cloudflare/goflow/v3/producer"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type StateSFlow struct {
 	Transport Transport
 	Logger    Logger
+
+	Config *producer.SFlowProducerConfig
 }
 
 func (s *StateSFlow) DecodeFlow(msg interface{}) error {
 	pkt := msg.(BaseMessage)
 	buf := bytes.NewBuffer(pkt.Payload)
 	key := pkt.Src.String()
+
+	ts := uint64(time.Now().UTC().Unix())
+	if pkt.SetTime {
+		ts = uint64(pkt.RecvTime.UTC().Unix())
+	}
 
 	timeTrackStart := time.Now()
 	msgDec, err := sflow.DecodeMessage(buf)
@@ -107,7 +115,7 @@ func (s *StateSFlow) DecodeFlow(msg interface{}) error {
 	}
 
 	var flowMessageSet []*flowmessage.FlowMessage
-	flowMessageSet, err = producer.ProcessMessageSFlow(msgDec)
+	flowMessageSet, err = producer.ProcessMessageSFlowConfig(msgDec, s.Config)
 
 	timeTrackStop := time.Now()
 	DecoderTime.With(
@@ -116,7 +124,6 @@ func (s *StateSFlow) DecodeFlow(msg interface{}) error {
 		}).
 		Observe(float64((timeTrackStop.Sub(timeTrackStart)).Nanoseconds()) / 1000)
 
-	ts := uint64(time.Now().UTC().Unix())
 	for _, fmsg := range flowMessageSet {
 		fmsg.TimeReceived = ts
 		fmsg.TimeFlowStart = ts
