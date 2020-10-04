@@ -165,6 +165,7 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 		keyStr := HashProto(s.keying, flowMessage)
 		key = sarama.StringEncoder(keyStr)
 	}
+	flowMessage.SamplingRate = 1000
 	var b []byte
 	if !s.FixedLengthProto {
 		b, _ = proto.Marshal(flowMessage)
