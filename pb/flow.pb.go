@@ -177,6 +177,48 @@ func (m *FlowMessage) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_FlowMessage proto.InternalMessageInfo
 
+func (x *FlowMessage) GetGate() string {
+	if x != nil {
+		return x.Gate
+	}
+	return ""
+}
+
+func (x *FlowMessage) GetExporter() string {
+	if x != nil {
+		return x.Exporter
+	}
+	return ""
+}
+
+func (x *FlowMessage) GetIngressPort() string {
+	if x != nil {
+		return x.IngressPort
+	}
+	return ""
+}
+
+func (x *FlowMessage) GetProtocol() string {
+	if x != nil {
+		return x.Protocol
+	}
+	return ""
+}
+
+func (x *FlowMessage) GetSrcASOrg() string {
+	if x != nil {
+		return x.SrcASOrg
+	}
+	return ""
+}
+
+func (x *FlowMessage) GetDstASOrg() string {
+	if x != nil {
+		return x.DstASOrg
+	}
+	return ""
+}
+
 func (m *FlowMessage) GetType() FlowMessage_FlowType {
 	if m != nil {
 		return m.Type
