@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudflare/goflow/v3/transport"
 	"github.com/cloudflare/goflow/v3/utils"
+	"github.com/oschwald/maxminddb-golang"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
@@ -68,6 +69,15 @@ func main() {
 
 	lvl, _ := log.ParseLevel(*LogLevel)
 	log.SetLevel(lvl)
+
+	//=== MMDB Initialization
+	var mmErr error
+	transport.MMDB, mmErr = maxminddb.Open("C:/Users/gsantiago/Downloads/GeoLite2-ASN_20201006/GeoLite2-ASN.mmdb")
+	if mmErr != nil {
+		log.Fatal(mmErr)
+	}
+	defer transport.MMDB.Close()
+	//=== Edited by Gustavo Santiago - 2020-10-05
 
 	var defaultTransport utils.Transport
 	defaultTransport = &utils.DefaultLogTransport{}

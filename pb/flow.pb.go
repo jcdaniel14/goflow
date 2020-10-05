@@ -60,6 +60,8 @@ type FlowMessage struct {
 	Exporter    string
 	IngressPort string
 	Protocol    string
+	SrcASOrg    string
+	DstASOrg    string
 
 	// === Edited by Gustavo Santiago - 2020-10-05
 

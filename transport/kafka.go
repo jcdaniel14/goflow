@@ -10,12 +10,17 @@ import (
 	flowmessage "github.com/cloudflare/goflow/v3/pb"
 	"github.com/cloudflare/goflow/v3/utils"
 	proto "github.com/golang/protobuf/proto"
+	"github.com/oschwald/maxminddb-golang"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 )
+
+//- MaxMind Database ASN
+var MMDB *maxminddb.Reader
 
 //- Protocol numbers dict
 var protocols = map[uint32]string{
@@ -311,7 +316,26 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 		protocol = strconv.Itoa(int(f.Proto))
 	}
 	f.Protocol = protocol
+
+	//- ASN & OrgName (Src&Dst)
+	f.SrcAS, f.SrcASOrg = lookupASN(net.IP(f.SrcAddr).String())
+	f.DstAS, f.DstASOrg = lookupASN(net.IP(f.DstAddr).String())
+
 	return f
+}
+
+// This example shows how to decode to a struct
+func lookupASN(ip string) (uint32, string) {
+	ip2 := net.ParseIP(ip)
+	var record struct {
+		ASN uint32 `maxminddb:"autonomous_system_number"`
+		Org string `maxminddb:"autonomous_system_organization"`
+	}
+	err := MMDB.Lookup(ip2, &record)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return record.ASN, record.Org
 }
 
 func (s KafkaState) Publish(msgs []*flowmessage.FlowMessage) {
