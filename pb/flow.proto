@@ -14,13 +14,6 @@ message FlowMessage {
     IPFIX = 4;
   }
 
-  string Gate = 1000;
-  string Exporter = 1001;
-  string IngressPort = 1002;
-  string Protocol = 1003;
-  string SrcASOrg = 1004;
-  string DstASOrg = 1005;
-
   FlowType Type = 1;
 
   uint64 TimeReceived = 2;
@@ -28,6 +21,15 @@ message FlowMessage {
   uint64 SamplingRate = 3;
 
   uint32 FlowDirection = 42;
+
+  // === Mutated objects
+  string Gate = 1000;
+  string Exporter = 1001;
+  string IngressPort = 1002;
+  string Protocol = 1003;
+  string SrcASOrg = 1004;
+  string DstASOrg = 1005;
+  // === Edited by Gustavo Santiago - 2020-10-05
 
   // Sampler information
   bytes SamplerAddress = 11;

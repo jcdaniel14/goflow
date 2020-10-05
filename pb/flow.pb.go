@@ -55,6 +55,12 @@ func (FlowMessage_FlowType) EnumDescriptor() ([]byte, []int) {
 }
 
 type FlowMessage struct {
+	Type          FlowMessage_FlowType `protobuf:"varint,1,opt,name=Type,proto3,enum=flowprotob.FlowMessage_FlowType" json:"Type,omitempty"`
+	TimeReceived  uint64               `protobuf:"varint,2,opt,name=TimeReceived,proto3" json:"TimeReceived,omitempty"`
+	SequenceNum   uint32               `protobuf:"varint,4,opt,name=SequenceNum,proto3" json:"SequenceNum,omitempty"`
+	SamplingRate  uint64               `protobuf:"varint,3,opt,name=SamplingRate,proto3" json:"SamplingRate,omitempty"`
+	FlowDirection uint32               `protobuf:"varint,42,opt,name=FlowDirection,proto3" json:"FlowDirection,omitempty"`
+
 	// === Mutated objects
 	Gate        string `protobuf:"bytes,1000,opt,name=Gate,proto3 json:"Gate,omitempty"`
 	Exporter    string `protobuf:"bytes,1001,opt,name=Exporter,proto3 json:"Exporter,omitempty"`
@@ -64,11 +70,6 @@ type FlowMessage struct {
 	DstASOrg    string `protobuf:"bytes,1005,opt,name=DstASOrg,proto3 json:"DstASOrg,omitempty"`
 	// === Edited by Gustavo Santiago - 2020-10-05
 
-	Type          FlowMessage_FlowType `protobuf:"varint,1,opt,name=Type,proto3,enum=flowprotob.FlowMessage_FlowType" json:"Type,omitempty"`
-	TimeReceived  uint64               `protobuf:"varint,2,opt,name=TimeReceived,proto3" json:"TimeReceived,omitempty"`
-	SequenceNum   uint32               `protobuf:"varint,4,opt,name=SequenceNum,proto3" json:"SequenceNum,omitempty"`
-	SamplingRate  uint64               `protobuf:"varint,3,opt,name=SamplingRate,proto3" json:"SamplingRate,omitempty"`
-	FlowDirection uint32               `protobuf:"varint,42,opt,name=FlowDirection,proto3" json:"FlowDirection,omitempty"`
 	// Sampler information
 	SamplerAddress []byte `protobuf:"bytes,11,opt,name=SamplerAddress,proto3" json:"SamplerAddress,omitempty"`
 	// Found inside packet
