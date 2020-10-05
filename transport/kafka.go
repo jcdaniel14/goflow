@@ -6,15 +6,99 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"os"
-	"reflect"
-	"strings"
-
 	sarama "github.com/Shopify/sarama"
 	flowmessage "github.com/cloudflare/goflow/v3/pb"
 	"github.com/cloudflare/goflow/v3/utils"
 	proto "github.com/golang/protobuf/proto"
+	"net"
+	"os"
+	"reflect"
+	"strconv"
+	"strings"
 )
+
+//SNMP Map --- Put here console output
+var interfaces = map[string]string{
+	"rointernetgye4:24":  "TenGigE0/0/0/4",
+	"rointernetgye4:25":  "TenGigE0/0/0/5",
+	"rointernetgye4:170": "TenGigE0/6/0/11",
+	"rointernetgye4:232": "Bundle-Ether98",
+	"rointernetgye4:188": "Bundle-Ether100",
+	"rointernetgye4:216": "Bundle-Ether96",
+	"rointernetgye4:211": "Bundle-Ether99",
+	"rointernetgye4:183": "Bundle-Ether95",
+	"rointernetgye4:228": "Bundle-Ether97",
+	"rointernetgye4:22":  "TenGigE0/0/0/2",
+	"rointernetgye4:137": "TenGigE0/2/0/11",
+	"rointernetgye4:138": "TenGigE0/2/0/12",
+	"rointernetgye4:171": "TenGigE0/6/0/12",
+	"rointernetgye4:127": "TenGigE0/2/0/1",
+	"rointernetgye4:233": "Bundle-Ether93",
+	"rointernetgye4:234": "Bundle-Ether200",
+	"rointernetgye4:235": "Bundle-Ether250",
+	"rointernetgye4:263": "Bundle-Ether252",
+	"rointernetgye4:265": "HundredGigE0/4/0/3.500",
+	"rointernetgye4:266": "HundredGigE0/4/0/3.510",
+
+	"rointernetgye3:143": "Bundle-Ether250",
+	"rointernetgye3:134": "Bundle-Ether98",
+	"rointernetgye3:120": "Bundle-Ether200",
+	"rointernetgye3:38":  "TenGigE0/2/0/10",
+
+	"routercdn2uio:274": "Bundle-Ether80",
+	"routercdn2uio:249": "Bundle-Ether112",
+	"routercdn2uio:256": "BVI2300",
+	"routercdn2uio:243": "BVI2201",
+	"routercdn2uio:283": "BVI2301",
+	"routercdn2uio:268": "Bundle-Ether114.2100",
+	"routercdn2uio:269": "BVI2202",
+	"routercdn2uio:265": "Bundle-Ether30",
+	"routercdn2uio:267": "Bundle-Ether114",
+
+	"routercdn2gye:306": "Bundle-Ether100",
+	"routercdn2gye:294": "BVI2300",
+	"routercdn2gye:274": "BVI2201",
+	"routercdn2gye:318": "BVI2301",
+	"routercdn2gye:312": "Bundle-Ether107.2100",
+	"routercdn2gye:307": "Bundle-Ether104",
+	"routercdn2gye:126": "TenGigE0/4/0/1",
+	"routercdn2gye:276": "Bundle-Ether108",
+	"routercdn2gye:305": "Bundle-Ether30",
+	"routercdn2gye:311": "Bundle-Ether107",
+	"routercdn2gye:443": "BVI2302",
+	"routercdn2gye:448": "Bundle-Ether50",
+
+	"rointernetuio1:91":  "Bundle-Ether100",
+	"rointernetuio1:109": "Bundle-Ether93",
+	"rointernetuio1:92":  "Bundle-Ether200",
+	"rointernetuio1:119": "TenGigE0/3/0/1",
+	"rointernetuio1:107": "Bundle-Ether90",
+	"rointernetuio1:65":  "TenGigE0/7/0/3",
+	"rointernetuio1:50":  "TenGigE0/6/0/4",
+	"rointernetuio1:122": "Bundle-Ether98",
+	"rointernetuio1:161": "TenGigE0/4/0/4",
+	"rointernetuio1:174": "Bundle-Ether95",
+	"rointernetuio1:36":  "HundredGigE0/0/0/2",
+
+	"pe1asrgyes:592": "BVI90",
+	"pe1asruios:695": "BVI90",
+
+	"pe2asrgyedc:231": "Bundle-Ether10",
+
+	"pe1asruiod:867": "BVI90",
+}
+
+//Exporter
+var nodes = map[string]string{
+	"10.101.11.211":  "rointernetgye4",
+	"201.218.56.129": "routercdn2gye",
+	"10.101.21.149":  "rointernetuio1",
+	"10.101.21.148":  "routercdn2uio",
+	"10.101.11.226":  "pe1asrgyes",
+	"10.101.21.208":  "pe1asruios",
+	"10.101.107.175": "pe2asrgyedc",
+	"10.101.21.219":  "pe1asruiod",
+}
 
 var (
 	KafkaTLS   *bool
@@ -165,7 +249,11 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 		keyStr := HashProto(s.keying, flowMessage)
 		key = sarama.StringEncoder(keyStr)
 	}
-	flowMessage.SamplingRate = 1000
+
+	// === Mutations al paquete netflow
+	flowMessage = parseFlow(flowMessage)
+	// === Editado por Gustavo Santiago - 2020-10-05
+
 	var b []byte
 	if !s.FixedLengthProto {
 		b, _ = proto.Marshal(flowMessage)
@@ -179,6 +267,29 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 		Key:   key,
 		Value: sarama.ByteEncoder(b),
 	}
+}
+
+func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
+	//- Fixed Sampling Rate at 1000
+	f.SamplingRate = 1000
+
+	//- Exporter mapping
+	node := nodes[net.IP(f.SamplerAddress).String()]
+	if node == "" {
+		node = net.IP(f.SamplerAddress).String()
+	}
+	f.Exporter = node
+
+	//- Port mapping
+	ingressPort := interfaces[node+":"+strconv.Itoa(int(f.InIf))]
+	if ingressPort == "" {
+		ingressPort = strconv.Itoa(int(f.InIf))
+	}
+	f.IngressPort = ingressPort
+
+	//- Gate mapping
+	f.Gate = f.Exporter + ":" + f.IngressPort
+	return f
 }
 
 func (s KafkaState) Publish(msgs []*flowmessage.FlowMessage) {

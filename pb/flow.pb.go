@@ -55,6 +55,13 @@ func (FlowMessage_FlowType) EnumDescriptor() ([]byte, []int) {
 }
 
 type FlowMessage struct {
+	// === Mutated objects
+	Gate        string
+	Exporter    string
+	IngressPort string
+
+	// === Edited by Gustavo Santiago - 2020-10-05
+
 	Type          FlowMessage_FlowType `protobuf:"varint,1,opt,name=Type,proto3,enum=flowprotob.FlowMessage_FlowType" json:"Type,omitempty"`
 	TimeReceived  uint64               `protobuf:"varint,2,opt,name=TimeReceived,proto3" json:"TimeReceived,omitempty"`
 	SequenceNum   uint32               `protobuf:"varint,4,opt,name=SequenceNum,proto3" json:"SequenceNum,omitempty"`
