@@ -273,7 +273,8 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 
 	// === Mutations al paquete netflow
 	flowMessage = parseFlow(flowMessage)
-	fmt.Print(json.Marshal(flowMessage))
+	b2, _ := json.Marshal(flowMessage)
+	fmt.Println(string(b2))
 	// === Editado por Gustavo Santiago - 2020-10-05
 
 	var b []byte
