@@ -17,6 +17,21 @@ import (
 	"strings"
 )
 
+//- Protocol numbers dict
+var protocols = map[uint32]string{
+	1:   "ICMP",
+	2:   "IGMP",
+	4:   "IPv4",
+	6:   "TCP",
+	17:  "UDP",
+	41:  "IPv6",
+	47:  "GRE",
+	50:  "ESP",
+	58:  "IPv6-ICMP",
+	89:  "OSPFIGP",
+	103: "PIM",
+}
+
 //SNMP Map --- Put here console output
 var interfaces = map[string]string{
 	"rointernetgye4:24":  "TenGigE0/0/0/4",
@@ -289,6 +304,13 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 
 	//- Gate mapping
 	f.Gate = f.Exporter + ":" + f.IngressPort
+
+	//- Protocol number
+	protocol := protocols[f.Proto]
+	if protocol == "" {
+		protocol = strconv.Itoa(int(f.Proto))
+	}
+	f.Protocol = protocol
 	return f
 }
 

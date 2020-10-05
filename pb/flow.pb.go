@@ -59,6 +59,7 @@ type FlowMessage struct {
 	Gate        string
 	Exporter    string
 	IngressPort string
+	Protocol    string
 
 	// === Edited by Gustavo Santiago - 2020-10-05
 
