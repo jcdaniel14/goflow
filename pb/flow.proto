@@ -13,6 +13,14 @@ message FlowMessage {
     NETFLOW_V9 = 3;
     IPFIX = 4;
   }
+
+  string Gate = 1000;
+  string Exporter = 1001;
+  string IngressPort = 1002;
+  string Protocol = 1003;
+  string SrcASOrg = 1004;
+  string DstASOrg = 1005;
+
   FlowType Type = 1;
 
   uint64 TimeReceived = 2;
