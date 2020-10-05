@@ -72,7 +72,7 @@ func main() {
 
 	//=== MMDB Initialization
 	var mmErr error
-	transport.MMDB, mmErr = maxminddb.Open("C:/Users/gsantiago/Downloads/GeoLite2-ASN_20201006/GeoLite2-ASN.mmdb")
+	transport.MMDB, mmErr = maxminddb.Open("/home/clickhouse/goflow/dict/GeoLite2-ASN.mmdb")
 	if mmErr != nil {
 		log.Fatal(mmErr)
 	}
