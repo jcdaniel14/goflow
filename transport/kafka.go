@@ -3,6 +3,7 @@ package transport
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -272,6 +273,8 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 
 	// === Mutations al paquete netflow
 	flowMessage = parseFlow(flowMessage)
+	b2, _ := json.Marshal(flowMessage)
+	fmt.Println(string(b2))
 	// === Editado por Gustavo Santiago - 2020-10-05
 
 	var b []byte
@@ -317,9 +320,9 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	}
 	f.Protocol = protocol
 
-	//- ASN & OrgName (Src&Dst)
-	f.SrcAS, f.SrcASOrg = lookupASN(net.IP(f.SrcAddr).String())
-	f.DstAS, f.DstASOrg = lookupASN(net.IP(f.DstAddr).String())
+	//- ASN & OrgName (Src&Dst) -- se invierte la direccion por ser ingress
+	f.SrcAS, f.SrcASOrg = lookupASN(net.IP(f.DstAddr).String())
+	f.DstAS, f.DstASOrg = lookupASN(net.IP(f.SrcAddr).String())
 
 	//- Addresses
 	f.ClientAddr = net.IP(f.DstAddr).String()
