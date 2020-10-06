@@ -29,6 +29,8 @@ message FlowMessage {
   string Protocol = 1003;
   string SrcASOrg = 1004;
   string DstASOrg = 1005;
+  string ClientAddr = 1006;
+  string ServerAddr = 1007;
   // === Edited by Gustavo Santiago - 2020-10-05
 
   // Sampler information
