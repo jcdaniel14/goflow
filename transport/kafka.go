@@ -3,7 +3,6 @@ package transport
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -273,8 +272,8 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 
 	// === Mutations al paquete netflow
 	flowMessage = parseFlow(flowMessage)
-	b2, _ := json.Marshal(flowMessage)
-	fmt.Println(string(b2))
+	//b2, _ := json.Marshal(flowMessage)
+	//fmt.Println(string(b2))
 	// === Editado por Gustavo Santiago - 2020-10-05
 
 	var b []byte
