@@ -323,9 +323,12 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	f.SrcAS, f.SrcASOrg = lookupASN(net.IP(f.DstAddr).String())
 	f.DstAS, f.DstASOrg = lookupASN(net.IP(f.SrcAddr).String())
 
-	//- Addresses
+	//- Invert Addresses & Ports
 	f.ClientAddr = net.IP(f.DstAddr).String()
 	f.ServerAddr = net.IP(f.SrcAddr).String()
+	tmp := f.SrcPort
+	f.SrcPort = f.DstPort
+	f.DstPort = tmp
 
 	return f
 }
