@@ -326,7 +326,7 @@ func parseFlow(f *flowmessage.FlowMessage) (*flowmessage.FlowMessage, error) {
 	if f.Gate == "routercdn2gye:Bundle-Ether30" {
 		return f, errors.New(fmt.Sprintf("Excluded interface %s", f.Gate))
 	}
-	if strings.Contains(f.Exporter, "pe1asr") {
+	if f.Exporter == "pe1asrgyes" || f.Exporter == "pe1asruios" || f.Exporter == "pe1asruiod" {
 		if !allowed[f.Gate] {
 			return f, errors.New(fmt.Sprintf("Excluded interface %s", f.Gate))
 		}
