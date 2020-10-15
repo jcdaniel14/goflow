@@ -277,11 +277,11 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	}
 
 	// === Mutations al paquete netflow
-	var err error
-	flowMessage, err = parseFlow(flowMessage)
-	if err != nil {
-		return //- Err means blocked interface netflow
-	}
+	//var err error
+	flowMessage = parseFlow(flowMessage)
+	//if err != nil {
+	//	return //- Err means blocked interface netflow
+	//}
 	//b2, _ := json.Marshal(flowMessage)
 	//fmt.Println(string(b2))
 	// === Editado por Gustavo Santiago - 2020-10-05
@@ -301,7 +301,7 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	}
 }
 
-func parseFlow(f *flowmessage.FlowMessage) (*flowmessage.FlowMessage, error) {
+func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	//- Fixed Sampling Rate at 1000
 	f.SamplingRate = 1000
 
@@ -323,14 +323,14 @@ func parseFlow(f *flowmessage.FlowMessage) (*flowmessage.FlowMessage, error) {
 	f.Gate = f.Exporter + ":" + f.IngressPort
 
 	// Explicit excluded
-	if f.Gate == "routercdn2gye:Bundle-Ether30" {
-		return f, errors.New(fmt.Sprintf("Excluded interface %s", f.Gate))
-	}
-	if f.Exporter == "pe1asrgyes" || f.Exporter == "pe1asruios" || f.Exporter == "pe1asruiod" {
-		if !allowed[f.Gate] {
-			return f, errors.New(fmt.Sprintf("Excluded interface %s", f.Gate))
-		}
-	}
+	//if f.Gate == "routercdn2gye:Bundle-Ether30" {
+	//	return f, errors.New(fmt.Sprintf("Excluded interface %s", f.Gate))
+	//}
+	//if f.Exporter == "pe1asrgyes" || f.Exporter == "pe1asruios" || f.Exporter == "pe1asruiod" {
+	//	if !allowed[f.Gate] {
+	//		return f, errors.New(fmt.Sprintf("Excluded interface %s", f.Gate))
+	//	}
+	//}
 
 	//- Protocol number
 	protocol := protocols[f.Proto]
@@ -350,7 +350,7 @@ func parseFlow(f *flowmessage.FlowMessage) (*flowmessage.FlowMessage, error) {
 	f.SrcPort = f.DstPort
 	f.DstPort = tmp
 
-	return f, nil
+	return f
 }
 
 // This example shows how to decode to a struct
