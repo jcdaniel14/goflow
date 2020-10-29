@@ -351,6 +351,12 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	//- ASN & OrgName (Src&Dst) -- se invierte la direccion por ser ingress
 	f.SrcAS, f.SrcASOrg = lookupASN(net.IP(f.DstAddr).String())
 	f.DstAS, f.DstASOrg = lookupASN(net.IP(f.SrcAddr).String())
+	if f.SrcAS == 0 {
+		f.SrcASOrg = "private"
+	}
+	if f.DstAS == 0 {
+		f.DstASOrg = "private"
+	}
 
 	//- Invert Addresses & Ports
 	f.ClientAddr = net.IP(f.DstAddr).String()
