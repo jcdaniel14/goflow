@@ -38,10 +38,10 @@ var protocols = map[uint32]string{
 }
 
 //- Allowed interfaces
-var allowed = map[string]bool{
-	"pe1asrgyes:BVI90": true,
-	"pe1asruios:BVI90": true,
-	"pe1asruiod:BVI90": true,
+var lesser = map[string]bool{
+	"pe1asrgyes": true,
+	"pe1asruios": true,
+	"pe1asruiod": true,
 }
 
 //SNMP Map --- Put here console output
@@ -321,8 +321,10 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	//- Port mapping
 	ingressPort := interfaces[node+":"+strconv.Itoa(int(f.InIf))]
 	if ingressPort == "" {
-		return nil
-		//ingressPort = strconv.Itoa(int(f.InIf)) Do not process not known interfaces
+		if lesser[node] { // - Si es un nodo turro - ignora
+			return nil
+		}
+		ingressPort = strconv.Itoa(int(f.InIf))
 	}
 	f.IngressPort = ingressPort
 
