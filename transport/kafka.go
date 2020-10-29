@@ -290,21 +290,21 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	//fmt.Println(string(b2))
 	// === Editado por Gustavo Santiago - 2020-10-05
 
-	if flowMessage != nil {
-		var b []byte
-		if !s.FixedLengthProto {
-			b, _ = proto.Marshal(flowMessage)
-		} else {
-			buf := proto.NewBuffer([]byte{})
-			buf.EncodeMessage(flowMessage)
-			b = buf.Bytes()
-		}
-		s.producer.Input() <- &sarama.ProducerMessage{
-			Topic: s.topic,
-			Key:   key,
-			Value: sarama.ByteEncoder(b),
-		}
+	//if flowMessage != nil {
+	var b []byte
+	if !s.FixedLengthProto {
+		b, _ = proto.Marshal(flowMessage)
+	} else {
+		buf := proto.NewBuffer([]byte{})
+		buf.EncodeMessage(flowMessage)
+		b = buf.Bytes()
 	}
+	s.producer.Input() <- &sarama.ProducerMessage{
+		Topic: s.topic,
+		Key:   key,
+		Value: sarama.ByteEncoder(b),
+	}
+	//}
 }
 
 func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
@@ -321,9 +321,9 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	//- Port mapping
 	ingressPort := interfaces[node+":"+strconv.Itoa(int(f.InIf))]
 	if ingressPort == "" {
-		if lesser[node] { // - Si es un nodo turro - ignora
-			return nil
-		}
+		//if lesser[node] { // - Si es un nodo turro - ignora
+		//	return nil
+		//}
 		ingressPort = strconv.Itoa(int(f.InIf))
 	}
 	f.IngressPort = ingressPort
