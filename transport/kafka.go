@@ -105,6 +105,9 @@ var interfaces = map[string]string{
 	"roclientesdcgye1:82": "Bundle-Ether99",
 	"roclientesdcgye1:46": "TenGigE0/0/0/18",
 
+	"roclientesdcgye2:81": "Bundle-Ether95",
+	"roclientesdcgye2:52": "TenGigE0/0/0/12",
+
 	"pe1asrgyes:592": "BVI90",
 	"pe1asruios:695": "BVI90",
 
@@ -124,6 +127,7 @@ var nodes = map[string]string{
 	"10.101.107.175": "pe2asrgyedc",
 	"10.101.21.219":  "pe1asruiod",
 	"10.101.11.223":  "roclientesdcgye1",
+	"10.101.11.224":  "roclientesdcgye2",
 }
 
 var (
@@ -286,18 +290,20 @@ func (s KafkaState) SendKafkaFlowMessage(flowMessage *flowmessage.FlowMessage) {
 	//fmt.Println(string(b2))
 	// === Editado por Gustavo Santiago - 2020-10-05
 
-	var b []byte
-	if !s.FixedLengthProto {
-		b, _ = proto.Marshal(flowMessage)
-	} else {
-		buf := proto.NewBuffer([]byte{})
-		buf.EncodeMessage(flowMessage)
-		b = buf.Bytes()
-	}
-	s.producer.Input() <- &sarama.ProducerMessage{
-		Topic: s.topic,
-		Key:   key,
-		Value: sarama.ByteEncoder(b),
+	if flowMessage != nil {
+		var b []byte
+		if !s.FixedLengthProto {
+			b, _ = proto.Marshal(flowMessage)
+		} else {
+			buf := proto.NewBuffer([]byte{})
+			buf.EncodeMessage(flowMessage)
+			b = buf.Bytes()
+		}
+		s.producer.Input() <- &sarama.ProducerMessage{
+			Topic: s.topic,
+			Key:   key,
+			Value: sarama.ByteEncoder(b),
+		}
 	}
 }
 
@@ -315,7 +321,8 @@ func parseFlow(f *flowmessage.FlowMessage) *flowmessage.FlowMessage {
 	//- Port mapping
 	ingressPort := interfaces[node+":"+strconv.Itoa(int(f.InIf))]
 	if ingressPort == "" {
-		ingressPort = strconv.Itoa(int(f.InIf))
+		return nil
+		//ingressPort = strconv.Itoa(int(f.InIf)) Do not process not known interfaces
 	}
 	f.IngressPort = ingressPort
 
