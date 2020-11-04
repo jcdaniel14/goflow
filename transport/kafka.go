@@ -66,6 +66,8 @@ var interfaces = map[string]string{
 	"rointernetgye4:263": "Bundle-Ether252",
 	"rointernetgye4:265": "HundredGigE0/4/0/3.500",
 	"rointernetgye4:266": "HundredGigE0/4/0/3.510",
+	"rointernetgye4:276": "Bundle-Ether50.51",
+	"rointernetgye4:277": "Bundle-Ether50.50",
 
 	"routercdn2uio:274": "Bundle-Ether80",
 	"routercdn2uio:249": "Bundle-Ether112",
@@ -102,6 +104,7 @@ var interfaces = map[string]string{
 	"rointernetuio1:174": "Bundle-Ether95",
 	"rointernetuio1:36":  "HundredGigE0/0/0/2",
 
+	"roclientesdcgye1:83": "Bundle-Ether98",
 	"roclientesdcgye1:82": "Bundle-Ether99",
 	"roclientesdcgye1:46": "TenGigE0/0/0/18",
 
