@@ -105,6 +105,7 @@ var interfaces = map[string]string{
 	"rointernetuio1:174": "Bundle-Ether95",
 	"rointernetuio1:36":  "HundredGigE0/0/0/2",
 	"rointernetuio1:37":  "HundredGigE0/0/0/3",
+	"rointernetuio1:180": "HundredGigE0/7/0/0",
 
 	"roclientesdcgye1:83": "Bundle-Ether98",
 	"roclientesdcgye1:82": "Bundle-Ether99",
