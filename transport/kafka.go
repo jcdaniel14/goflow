@@ -78,7 +78,7 @@ var interfaces = map[string]string{
 	"routercdn2uio:269": "BVI2202",
 	"routercdn2uio:265": "Bundle-Ether30",
 	"routercdn2uio:267": "Bundle-Ether114",
-	"routercdn2uio:324": "HundredGigE0/2/0/0",
+	"routercdn2uio:324": "HundredGigE0/0/0/0",
 
 	"routercdn2gye:306": "Bundle-Ether100",
 	"routercdn2gye:294": "BVI2300",
